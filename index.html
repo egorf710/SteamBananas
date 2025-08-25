@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SteamBanas</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Список объектов</h1>
+<div id="itemList"></div>
+
+<body>
+
+    <pre id="output"></pre>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+        import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZ8X8NaoXsq288dwj5j06EF6jsdWC-zhM",
+            databaseURL: "https://steambananas-b56fa-default-rtdb.firebaseio.com/"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Получение данных
+        const output = document.getElementById('output');
+
+        const inventoryRef = ref(database, '/Inventory/');
+        get(inventoryRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                displayItems(data);
+            } else {
+                output.textContent = 'Нет данных';
+            }
+        }).catch((error) => {
+            console.error("Ошибка при получении данных: ", error);
+        });
+
+            // Отображение данных на странице
+        function displayItems(items) {
+            const itemList = document.getElementById('itemList');
+            itemList.innerHTML = '';
+
+            for (const key in items) {
+                const item = items[key];
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'item';
+                itemDiv.innerHTML = `
+                    <strong>Название:</strong> ${item.Name}<br>
+                    <strong>Тип:</strong> ${item.Type}<br>
+                    <strong>Торгуемый:</strong> ${item.Marketable}<br>
+                    <strong>Количество:</strong> ${item.count}
+                `;
+                itemList.appendChild(itemDiv);
+            }
+        }
+
+    </script>
+</body>
+</html>
